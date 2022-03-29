@@ -67,7 +67,7 @@ jobs:
       - name: Ensure a clean working directory
         run: git diff --name-status --exit-code
       - name: Build production app
-        run: yarn build:prod
+        run: exit 1 # yarn build:prod
         env:
           DESKTOP_OAUTH_CLIENT_ID: ${{ secrets.DESKTOP_OAUTH_CLIENT_ID }}
           DESKTOP_OAUTH_CLIENT_SECRET:
