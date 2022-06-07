@@ -10,15 +10,14 @@ jobs:
     #name: ${{ matrix.friendlyName }} ${{ matrix.arch }}
     runs-on: ubuntu-latest
     permissions: read-all
-    node: [16.13.0]
     steps:
       - uses: actions/checkout@v2
         with:
           submodules: recursive
-      - name: Use Node.js ${{ node }}
+      - name: Setup Node.js
         uses: actions/setup-node@v1
         with:
-          node-version: ${{ node }}
+          node-version: 16.13.0
 
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
