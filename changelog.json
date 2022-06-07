@@ -1,5 +1,10 @@
 {
   "releases": {
+    "3.0.2-beta5": [
+      "[Improved] Add support for SSH password prompts when accessing repositories - #14676",
+      "[Fixed] Fix Markdown syntax highlighting - #14710",
+      "[???] Fix leaked background process on Windows - #14733. Thanks @tsvetilian-ty!"
+    ],
     "3.0.2-beta2": [
       "[Fixed] Fix crash launching the app on macOS High Sierra - #14712"
     ],
