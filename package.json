@@ -35,6 +35,7 @@
     "rebuild-hard:dev": "yarn clean-slate && yarn build:dev",
     "rebuild-hard:prod": "yarn clean-slate && yarn build:prod",
     "draft-release": "ts-node -P script/tsconfig.json script/draft-release/index.ts",
+    "draft-release:pr": "ts-node -P script/tsconfig.json script/draft-release/draft-pull-request.ts",
     "draft-release:format": "prettier --check --write changelog.json app/package.json && yarn validate-changelog",
     "validate-changelog": "ts-node -P script/tsconfig.json script/validate-changelog.ts"
   },
