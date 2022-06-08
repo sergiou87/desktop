@@ -5,14 +5,12 @@ on:
     branches:
       - releases/*
 
-permissions:
-  pull-requests: write
-
 jobs:
   build:
     #name: ${{ matrix.friendlyName }} ${{ matrix.arch }}
     runs-on: ubuntu-latest
-    permissions: read-all
+    permissions:
+      pull-requests: write
     steps:
       - uses: actions/checkout@v2
         with:
