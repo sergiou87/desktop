@@ -17,7 +17,6 @@ jobs:
           submodules: recursive
 
       - name: Create Pull Request content
-        id: create_pr_content
         run: |
           BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/})
           VERSION=$(echo ${BRANCH_NAME#releases/})
@@ -32,18 +31,32 @@ jobs:
             RELEASE_DESCRIPTION="${BUILD_NUMBER}th beta of the v${VERSION} series"
           fi
 
-          TITLE="Release $VERSION"
-          TEMPLATE=`cat .github/release_pull_request_template.md`
-          BODY=${TEMPLATE/RELEASE_DESCRIPTION/$RELEASE_DESCRIPTION}
+          PR_TITLE="Release $VERSION"
+          PR_BODY=$(cat << EOF
+          ## Description
+          Looking for the PR for the upcoming ${RELEASE_DESCRIPTION}? Well, you've just found it, congratulations!
 
-          echo "::set-output name=pr_title::$TITLE"
-          echo "::set-output name=pr_body::$BODY"
+          ## Release checklist
+
+          - [ ] Check to see if there are any errors in Sentry that have only occurred since the last production release
+          - [ ] Verify that all feature flags are flipped appropriately
+          - [ ] If there are any new metrics, ensure that central and desktop.github.com have been updated
+          EOF
+          )
+
+          echo "PR_BODY<<EOF" >> $GITHUB_ENV
+          echo "$PR_BODY" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+          echo "PR_TITLE<<EOF" >> $GITHUB_ENV
+          echo "$PR_TITLE" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
 
       - name: Create Release Pull Request
         uses: peter-evans/create-pull-request@v4.0.4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          title: ${{ steps.create_pr_content.outputs.pr_title }}
-          body: ${{ steps.create_pr_content.outputs.pr_body }}
+          title: ${{ env.PR_TITLE }}
+          body: ${{ env.PR_BODY }}
           branch: ${{ github.ref }}
           base: development
