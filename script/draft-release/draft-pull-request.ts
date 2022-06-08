@@ -1,6 +1,52 @@
 /// <reference path="../globals.d.ts" />
 
 import appPackage from '../../app/package.json'
+import * as HTTPS from 'https'
+
+export function createPullRequest(
+  title: string,
+  body: string,
+  branch: string
+): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const options: HTTPS.RequestOptions = {
+      host: 'api.github.com',
+      protocol: 'https:',
+      path: '/repos/sergiou87/desktop/pulls',
+      method: 'POST',
+      headers: {
+        Authorization: `bearer ${process.env.GITHUB_ACCESS_TOKEN}`,
+        'User-Agent': 'what-the-changelog',
+      },
+    }
+
+    const request = HTTPS.request(options, response => {
+      let received = ''
+      response.on('data', chunk => {
+        received += chunk
+      })
+
+      response.on('end', () => {
+        try {
+          resolve(received)
+        } catch (e) {
+          reject()
+        }
+      })
+    })
+
+    request.write(
+      JSON.stringify({
+        title,
+        body,
+        base: 'development',
+        head: branch,
+      })
+    )
+
+    request.end()
+  })
+}
 
 const numberToOrdinal = (n: number) => {
   const s = ['th', 'st', 'nd', 'rd']
@@ -44,14 +90,15 @@ process.on('unhandledRejection', error => {
   console.error(error.message)
 })
 
-const args = process.argv.slice(2)
-const type = args[0]
-if (type !== 'title' && type !== 'body') {
-  throw new Error(`Invalid type ${type}, only 'title' and 'body' allowed`)
+async function run() {
+  const title = getPullRequestTitle(appPackage.version)
+  const body = getPullRequestBody(appPackage.version)
+  const response = await createPullRequest(
+    title,
+    body,
+    `releases/${appPackage.version}`
+  )
+  console.log(response)
 }
 
-const result =
-  type === 'title'
-    ? getPullRequestTitle(appPackage.version)
-    : getPullRequestBody(appPackage.version)
-console.log(result)
+run()

@@ -35,17 +35,8 @@ jobs:
       - name: Install and build dependencies
         run: yarn
 
-      - name: Create Pull Request content
+      - name: Create Pull Request
         id: create_pr_content
-        run: |
-          echo "##[set-output name=pr_title;]$(yarn draft-release:pr title)"
-          echo "##[set-output name=pr_body;]$(yarn draft-release:pr body)"
-
-      - name: Create Release Pull Request
-        uses: peter-evans/create-pull-request@v4.0.4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          title: ${{ steps.create_pr_content.output.pr_title }}
-          body: ${{ steps.create_pr_content.output.pr_body }}
-          branch: ${{ github.ref }}
-          base: development
+        run: yarn draft-release:pr
+        env:
+          GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
