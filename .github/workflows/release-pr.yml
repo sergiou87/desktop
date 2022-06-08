@@ -5,6 +5,9 @@ on:
     branches:
       - releases/*
 
+permission:
+  pull-requests: write
+
 jobs:
   build:
     #name: ${{ matrix.friendlyName }} ${{ matrix.arch }}
