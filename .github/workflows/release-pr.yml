@@ -33,7 +33,8 @@ jobs:
           fi
 
           TITLE="Release $VERSION"
-          BODY="## Description\nLooking for the PR for the upcoming ${RELEASE_DESCRIPTION}? Well, you've just found it, congratulations!\n## Release checklist\n- [ ] Check to see if there are any errors in Sentry that have only occurred since the last production release\n- [ ] Verify that all feature flags are flipped appropriately\n- [ ] If there are any new metrics, ensure that central and desktop.github.com have been updated\n"
+          TEMPLATE=`cat .github/release_pull_request_template.md`
+          BODY=${TEMPLATE/RELEASE_DESCRIPTION/$RELEASE_DESCRIPTION}
 
           echo "::set-output name=pr_title::$TITLE"
           echo "::set-output name=pr_body::$BODY"
