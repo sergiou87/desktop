@@ -46,7 +46,7 @@ jobs:
         uses: peter-evans/create-pull-request@v4.0.4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          title: ${{ steps.create_pr_content.output.pr_title }}
-          body: ${{ steps.create_pr_content.output.pr_body }}
+          title: ${{ steps.create_pr_content.outputs.pr_title }}
+          body: ${{ steps.create_pr_content.outputs.pr_body }}
           branch: ${{ github.ref }}
           base: development
