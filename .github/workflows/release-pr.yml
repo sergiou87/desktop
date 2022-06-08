@@ -5,7 +5,7 @@ on:
     branches:
       - releases/*
 
-permission:
+permissions:
   pull-requests: write
 
 jobs:
