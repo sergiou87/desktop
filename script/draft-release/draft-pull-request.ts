@@ -1,52 +1,7 @@
 /// <reference path="../globals.d.ts" />
 
 import appPackage from '../../app/package.json'
-import * as HTTPS from 'https'
-
-export function createPullRequest(
-  title: string,
-  body: string,
-  branch: string
-): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const options: HTTPS.RequestOptions = {
-      host: 'api.github.com',
-      protocol: 'https:',
-      path: '/repos/sergiou87/desktop/pulls',
-      method: 'POST',
-      headers: {
-        Authorization: `bearer ${process.env.GITHUB_ACCESS_TOKEN}`,
-        'User-Agent': 'what-the-changelog',
-      },
-    }
-
-    const request = HTTPS.request(options, response => {
-      let received = ''
-      response.on('data', chunk => {
-        received += chunk
-      })
-
-      response.on('end', () => {
-        try {
-          resolve(received)
-        } catch (e) {
-          reject()
-        }
-      })
-    })
-
-    request.write(
-      JSON.stringify({
-        title,
-        body,
-        base: 'development',
-        head: branch,
-      })
-    )
-
-    request.end()
-  })
-}
+import { createPR } from '../pr-api'
 
 const numberToOrdinal = (n: number) => {
   const s = ['th', 'st', 'nd', 'rd']
@@ -91,14 +46,16 @@ process.on('unhandledRejection', error => {
 })
 
 async function run() {
-  const title = getPullRequestTitle(appPackage.version)
-  const body = getPullRequestBody(appPackage.version)
-  const response = await createPullRequest(
-    title,
-    body,
-    `releases/${appPackage.version}`
-  )
-  console.log(response)
+  const version = appPackage.version
+  console.log(`Creating release Pull Request for ${version}...`)
+  const title = getPullRequestTitle(version)
+  const body = getPullRequestBody(version)
+  const response = await createPR(title, body, `releases/${version}`)
+  if (response === null) {
+    console.error('Failed to create release Pull Request')
+    process.exit(1)
+  }
+  console.log(`Done: ${response.permalink}`)
 }
 
 run()
