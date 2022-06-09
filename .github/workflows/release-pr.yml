@@ -1,4 +1,4 @@
-name: 'Release Pull Request'
+name: 'Create Release Pull Request'
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    #name: ${{ matrix.friendlyName }} ${{ matrix.arch }}
+    name: Create Pull Request
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
@@ -55,7 +55,7 @@ jobs:
       - name: Create Release Pull Request
         uses: peter-evans/create-pull-request@v4.0.4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.RELEASE_PR_APP_TOKEN }}
           title: ${{ env.PR_TITLE }}
           body: ${{ env.PR_BODY }}
           branch: ${{ github.ref }}
