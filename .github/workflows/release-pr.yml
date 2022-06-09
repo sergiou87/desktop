@@ -26,7 +26,14 @@ jobs:
             fi
             BUILD_TYPE="beta"
             BUILD_NUMBER=$(echo ${BUILD_TYPE_AND_NUMBER:4})
-            RELEASE_DESCRIPTION="${BUILD_NUMBER}th beta of the v${VERSION} series"
+            case $BUILD_NUMBER in
+              *1[0-9] | *[04-9]) BUILD_NUMBER_SUFFIX="th";;
+              *1) BUILD_NUMBER_SUFFIX="st";;
+              *2) BUILD_NUMBER_SUFFIX="nd";;
+              *3) BUILD_NUMBER_SUFFIX="rd";;
+            esac
+
+            RELEASE_DESCRIPTION="${BUILD_NUMBER}${BUILD_NUMBER_SUFFIX} beta of the v${VERSION} series"
           fi
 
           PR_TITLE="Release $VERSION"
