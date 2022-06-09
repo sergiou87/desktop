@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    name: Create Pull Request
+    name: Create Release Pull Request
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
