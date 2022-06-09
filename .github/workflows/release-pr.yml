@@ -12,6 +12,8 @@ jobs:
     permissions:
       pull-requests: write
     steps:
+      - uses: actions/checkout@v2
+
       - name: Create Pull Request content
         run: |
           BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/})
