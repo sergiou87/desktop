@@ -17,8 +17,8 @@ jobs:
       - name: Create Pull Request content
         run: |
 
-          PR_BODY=`./script/draft-release/release-pr-content.sh title ${GITHUB_REF#refs/heads/}`
-          PR_TITLE=`./script/draft-release/release-pr-content.sh body ${GITHUB_REF#refs/heads/}`
+          PR_TITLE=`./script/draft-release/release-pr-content.sh title ${GITHUB_REF#refs/heads/}`
+          PR_BODY=`./script/draft-release/release-pr-content.sh body ${GITHUB_REF#refs/heads/}`
 
           echo "PR_BODY<<EOF" >> $GITHUB_ENV
           echo "$PR_BODY" >> $GITHUB_ENV
