@@ -15,10 +15,18 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Create Pull Request content
-        id: create-pr-content
         run: |
-          echo "::set-output name=pr-title::$(./script/draft-release/release-pr-content.sh title ${GITHUB_REF#refs/heads/})\n"
-          echo "::set-output name=pr-body::$(./script/draft-release/release-pr-content.sh body ${GITHUB_REF#refs/heads/})\n"
+
+          PR_BODY=`./script/draft-release/release-pr-content.sh title ${GITHUB_REF#refs/heads/})`
+          PR_TITLE=`./script/draft-release/release-pr-content.sh body ${GITHUB_REF#refs/heads/})`
+
+          echo "PR_BODY<<EOF" >> $GITHUB_ENV
+          echo "$PR_BODY" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+          echo "PR_TITLE<<EOF" >> $GITHUB_ENV
+          echo "$PR_TITLE" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
 
       - uses: tibdex/github-app-token@v1
         id: generate-token
@@ -30,7 +38,7 @@ jobs:
         uses: peter-evans/create-pull-request@v4.0.4
         with:
           token: ${{ steps.generate-token.outputs.token }}
-          title: ${{ steps.create-pr-content.outputs.pr-title }}
-          body: ${{ steps.create-pr-content.outputs.pr-body }}
+          title: ${{ env.PR_TITLE }}
+          body: ${{ env.PR_BODY }}
           branch: ${{ github.ref }}
           base: development
