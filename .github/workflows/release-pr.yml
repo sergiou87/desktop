@@ -15,47 +15,10 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Create Pull Request content
+        id: create-pr-content
         run: |
-          BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/})
-          VERSION=$(echo ${BRANCH_NAME#releases/})
-          RELEASE_DESCRIPTION="v${VERSION} production release"
-          if [[ "$VERSION" == *"-"* ]]; then
-            BUILD_TYPE_AND_NUMBER=$(echo ${VERSION##*-})
-            if [[ "$BUILD_TYPE_AND_NUMBER" != *"beta" ]]; then
-              echo "Only beta and production builds have release PRs"
-            fi
-            BUILD_TYPE="beta"
-            BUILD_NUMBER=$(echo ${BUILD_TYPE_AND_NUMBER:4})
-            case $BUILD_NUMBER in
-              *1[0-9] | *[04-9]) BUILD_NUMBER_SUFFIX="th";;
-              *1) BUILD_NUMBER_SUFFIX="st";;
-              *2) BUILD_NUMBER_SUFFIX="nd";;
-              *3) BUILD_NUMBER_SUFFIX="rd";;
-            esac
-
-            RELEASE_DESCRIPTION="${BUILD_NUMBER}${BUILD_NUMBER_SUFFIX} beta of the v${VERSION} series"
-          fi
-
-          PR_TITLE="Release $VERSION"
-          PR_BODY=$(cat << EOF
-          ## Description
-          Looking for the PR for the upcoming ${RELEASE_DESCRIPTION}? Well, you've just found it, congratulations!
-
-          ## Release checklist
-
-          - [ ] Check to see if there are any errors in Sentry that have only occurred since the last production release
-          - [ ] Verify that all feature flags are flipped appropriately
-          - [ ] If there are any new metrics, ensure that central and desktop.github.com have been updated
-          EOF
-          )
-
-          echo "PR_BODY<<EOF" >> $GITHUB_ENV
-          echo "$PR_BODY" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
-
-          echo "PR_TITLE<<EOF" >> $GITHUB_ENV
-          echo "$PR_TITLE" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+          echo "::set-output name=pr-title::$(./script/draft-release/release-pr-content.sh title ${GITHUB_REF#refs/heads/})\n"
+          echo "::set-output name=pr-body::$(./script/draft-release/release-pr-content.sh body ${GITHUB_REF#refs/heads/})\n"
 
       - uses: tibdex/github-app-token@v1
         id: generate-token
@@ -67,7 +30,7 @@ jobs:
         uses: peter-evans/create-pull-request@v4.0.4
         with:
           token: ${{ steps.generate-token.outputs.token }}
-          title: ${{ env.PR_TITLE }}
-          body: ${{ env.PR_BODY }}
+          title: ${{ steps.create-pr-content.outputs.pr-title }}
+          body: ${{ steps.create-pr-content.outputs.pr-body }}
           branch: ${{ github.ref }}
           base: development
