@@ -13,10 +13,11 @@ jobs:
       pull-requests: write
     steps:
       - uses: actions/checkout@v2
+        if: ${{ !contains(github.ref, 'test') }}
 
       - name: Create Pull Request content
+        if: ${{ !contains(github.ref, 'test') }}
         run: |
-
           PR_TITLE=`./script/draft-release/release-pr-content.sh title ${GITHUB_REF#refs/heads/}`
           PR_BODY=`./script/draft-release/release-pr-content.sh body ${GITHUB_REF#refs/heads/}`
 
@@ -30,12 +31,14 @@ jobs:
 
       - uses: tibdex/github-app-token@v1
         id: generate-token
+        if: ${{ !contains(github.ref, 'test') }}
         with:
           app_id: ${{ secrets.RELEASE_PRS_APP_ID }}
           private_key: ${{ secrets.RELEASE_PRS_APP_PRIVATE_KEY }}
 
       - name: Create Release Pull Request
         uses: peter-evans/create-pull-request@v4.0.4
+        if: ${{ !contains(github.ref, 'test') }}
         with:
           token: ${{ steps.generate-token.outputs.token }}
           title: ${{ env.PR_TITLE }}
